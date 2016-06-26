@@ -3,11 +3,11 @@
 This project aims to provide easy way to launch vert.x instances. It just reads config file as Freemarker Template and 
 renders it with JVM System Properties. 
 
-Also because we think defining default behaviour for application may result 
-inconsistencies at production environment, we did not read default-cluster.xml file by default if application intendet to
-launch as clustered. cluster.xml file must be provided explicitly by defining -Dcluster-xml jvm argument.
+Also please note that we think defining default behaviour for application may result 
+inconsistencies at production environment, that is why we do not read default-cluster.xml file by default
+If application is going to be launched as clustered then cluster.xml file must be provided explicitly 
+by defining -Dcluster-xml jvm argument.
 
-and launches it.
 
 ### build.gradle Config
 
