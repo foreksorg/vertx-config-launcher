@@ -56,29 +56,60 @@ dependencies {
 
 Config file should include VertxOptions and Verticle's DeploymentOptions in following way
 
+>Verticle spesific config goes under deploymentOptions/config
+this will be reached as JsonObject by Verticle 
+when config() called inside the Verticle
+
+>deploymentOptions.config.instances -> spesify how many instance will be deployed
+
+>deploymentOptions.config.ha -> set true if verticle intented to be High Available
+
+>deploymentOptions.config.worker -> If this verticle is doing long running tasks
+                                    then this should be true, so that we let WorkerEventPool
+                                    to handle these tasks
+                                    
+>deploymentOptions.config.multiThreaded -> // If worker is true then Verticle may be called from different threads. 
+                                              Don't set this true if you don't know what you are doing
+                                              in ideal situation each Verticle should be called by only one thread
+					
+
+Please refer to documentation for other options 
+which are extraClasspath, isolatedClasses, isolationGroup, maxWorkerExecuteTime
+multiThreaded, worker, workerPoolName, workerPoolSize
+ 
+>vertxOptions.clustered -> If this field is true than vertx will run clustered so cluster.xml must provide
+
+>vertxOptions.clusterHost -> cluster host name, (OPTIONAL you can pass things like this"${nodeip}")
+
+>vertxOptions.quorumSize -> Untill quorum size satisfied verticle is not gonna be deployed
+
+>vertxOptions.haEnabled -> Set true if Vert.x should be High Available
+
+>vertxOptions.definition -> If vertx is ha than this can be grouped under this key
+
+>vertxOptions.eventLoopPoolSize -> Main Event Loop pool size, should be equal to CPU core size
+
+>vertxOptions.workerPoolSize -> If Vert.x has a lot of long running tasks
+                                Then Worker Event Pool should handle those
+                                And this can be greater than CPU core size
+                                
+Other options are addressResolverOptions, blockedThreadCheckInterval, clusterPingInterval, clusterPort
+clusterPublicHost, clusterPublicPort, eventBusOptions, internalBlockingPoolSize,
+maxEventLoopExecuteTime, maxWorkerExecuteTime, metricsOptions, warningExceptionTime              
+
 ```json
 {
 	"verticles": {
 		"com.foreks.feed.tip.filereader.FirstVerticle": {
 			"deploymentOptions": {
 				"config": {
-					//application spesific config here
-					//this will be reached as JsonObject by Verticle 
-					//when config() called inside the Verticle
+					
 				}
 				},
-				"instances": 1, //spesify how many instance will be deployed
-				"ha": true, // set true if verticle intented to be High Available
-				"worker": false, // If this verticle is doing long running tasks
-				                 // then this should be true, so that we let WorkerEventPool
-				                 // to handle these tasks
-				"multiThreaded": false // If worker is true then Verticle may be called from different threads. 
-                                       // Don't set this true if you don't know what you are doing
-                                       // in ideal situation each Verticle should be called by only one thread
-                 
-                 //Please refer to documentation for other options 
-                 //which are extraClasspath, isolatedClasses, isolationGroup, maxWorkerExecuteTime
-                 //multiThreaded, worker, workerPoolName, workerPoolSize
+				"instances": 1, 
+				"ha": true,
+				"worker": false, 
+				"multiThreaded": false 
 		},
 		"com.foreks.feed.tip.filereader.SecondVerticle": {
         			"deploymentOptions": {
@@ -98,18 +129,13 @@ Config file should include VertxOptions and Verticle's DeploymentOptions in foll
         		}
 	},
 	"vertxOptions": {
-		"clustered": true, //If this field is true than vertx will run clustered so cluster.xml must provided
-		"clusterHost": "${nodeip}" // cluster host name, (OPTIONAL you can pass things like this"${nodeip}")
-		"quorumSize": 1, // Untill quorum size satisfied verticle is not gonna be deployed
-		"haEnabled": true, //Set true if Vert.x should be High Available
-		"haGroup": "definition", // If vertx is ha than this can be grouped under this key
-		"eventLoopPoolSize": 4, // Main Event Loop pool size, should be equal to CPU core size
-		"workerPoolSize": 12 // If Vert.x has a lot of long running tasks
-		                     // Then Worker Event Pool should handle those
-		                     // And this can be greater than CPU core size
-		//other options are addressResolverOptions, blockedThreadCheckInterval, clusterPingInterval, clusterPort
-		//clusterPublicHost, clusterPublicPort, eventBusOptions, internalBlockingPoolSize,
-		//maxEventLoopExecuteTime, maxWorkerExecuteTime, metricsOptions, warningExceptionTime
+		"clustered": true, 
+		"clusterHost": "${nodeip}",
+		"quorumSize": 1,
+		"haEnabled": true, 
+		"haGroup": "definition",
+		"eventLoopPoolSize": 4,
+		"workerPoolSize": 12,
 	}
 }
 
