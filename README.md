@@ -1,7 +1,9 @@
 # Vert.x Config Launcher
 
 This project aims to provide easy way to launch vert.x instances. It just reads config file as Freemarker Template and 
-renders it with JVM System Properties. Because we think defining default behaviour for application may result 
+renders it with JVM System Properties. 
+
+Also because we think defining default behaviour for application may result 
 inconsistencies at production environment, we did not read default-cluster.xml file by default if application intendet to
 launch as clustered. cluster.xml file must be provided explicitly by defining -Dcluster-xml jvm argument.
 
