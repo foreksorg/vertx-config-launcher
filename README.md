@@ -11,7 +11,10 @@ by defining -Dcluster-xml jvm argument.
 
 ### build.gradle Config
 
-Set your application's mainClass as launcher's
+Set your application's mainClass as launcher's. And define your jvm default arguements, those will be used for rendering 
+config file. For example if config file includes ${mongoConfig} then when you pass -DmongoOptions=${file('conf/mongoConf.json').text}
+content of conf/mongoConf.json will be rendered. For what else can be done using template language please refer to [Freemarker]
+template language documentation.
 
 
 ```groovy
@@ -29,6 +32,7 @@ mainClassName = 'com.foreks.vertx.launcher.VertxConfigLauncher'
  check out below clusterHost field for how we use it
 */
 applicationDefaultJvmArgs = [
+    "-DmongoOptions=${file('conf/mongoConf.json').text}", // we can even render config reading file contents
 	'-Dnodeip=127.0.0.1',
 	'-Dcluster-xml=conf/cluster.xml' // if Vert.x is clustered,
 	                                 // Than cluster-xml JVM arg must be provided
@@ -109,7 +113,7 @@ maxEventLoopExecuteTime, maxWorkerExecuteTime, metricsOptions, warningExceptionT
 		"com.foreks.feed.tip.filereader.FirstVerticle": {
 			"deploymentOptions": {
 				"config": {
-					
+					"mongoClient":${mongoOptions}
 				}
 				},
 				"instances": 1, 
@@ -120,6 +124,7 @@ maxEventLoopExecuteTime, maxWorkerExecuteTime, metricsOptions, warningExceptionT
 		"com.foreks.feed.tip.filereader.SecondVerticle": {
         			"deploymentOptions": {
         				"config": {
+        				    "mongoClient":${mongoOptions},
         					"fileOpenOptions":{
         						"read":true,
         						"write":false
@@ -147,6 +152,9 @@ maxEventLoopExecuteTime, maxWorkerExecuteTime, metricsOptions, warningExceptionT
 
 ```
 
+### Todos
+
+ - Etcd integration, instead Jvm default arguements config can be rendered using etcd key value store
 
 License
 ----
@@ -169,3 +177,4 @@ limitations under the License.
 
    [DeploymentOptions]: <http://vertx.io/docs/apidocs/io/vertx/core/DeploymentOptions.html>
    [VertxOptions]: <http://vertx.io/docs/apidocs/io/vertx/core/VertxOptions.html>
+   [Freemarker]: <http://freemarker.org/>
