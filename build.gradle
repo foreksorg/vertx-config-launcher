@@ -7,8 +7,8 @@ plugins {
 
 sourceCompatibility = '1.8'
 
-version = "1.0.0-SNAPSHOT"
-group = "com.foreks.vertx"
+version = "1.0.0"
+group = "com.foreks"
 repositories {
 	mavenCentral()
 }
