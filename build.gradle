@@ -7,7 +7,7 @@ plugins {
 
 sourceCompatibility = '1.8'
 
-version = "1.0.0"
+version = "0.9.0-SNAPSHOT"
 group = "com.foreks"
 repositories {
 	mavenCentral()
@@ -20,13 +20,13 @@ publishing {
 	repositories {
 		maven {
 			credentials {
-				username nexusUsername
-				password nexusPassword
+				username ossrhUserName
+				password ossrhPassword
 			}
 			if (project.version.endsWith('-SNAPSHOT')) {
-				url "http://dev.foreks.com/nexus/content/repositories/snapshots"
+				url "https://oss.sonatype.org/content/repositories/snapshots"
 			} else {
-				url "http://dev.foreks.com/nexus/content/repositories/releases"
+				url " https://oss.sonatype.org/service/local/staging/deploy/maven2"
 			}
 		}
 	}
