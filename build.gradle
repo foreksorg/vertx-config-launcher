@@ -7,7 +7,7 @@ plugins {
 
 sourceCompatibility = '1.8'
 
-version = "0.9.0-SNAPSHOT"
+version = "0.9.0"
 group = "com.foreks"
 repositories {
 	mavenCentral()
@@ -26,7 +26,7 @@ publishing {
 			if (project.version.endsWith('-SNAPSHOT')) {
 				url "https://oss.sonatype.org/content/repositories/snapshots"
 			} else {
-				url " https://oss.sonatype.org/service/local/staging/deploy/maven2"
+				url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
 			}
 		}
 	}

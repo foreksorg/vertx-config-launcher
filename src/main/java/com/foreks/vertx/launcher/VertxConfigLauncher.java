@@ -78,7 +78,7 @@ public class VertxConfigLauncher {
 		readConf(System.getProperty("conf")).ifPresent(c -> {
 			createVertx(new VertxOptions(c.getJsonObject("vertxOptions"))).flatMap(vertx -> deployVerticles(vertx,
 																											c.getJsonObject("verticles")))
-																		  .subscribe(logSuccess, logError);
+			.subscribe(logSuccess, logError);
 		});
 	}
 
