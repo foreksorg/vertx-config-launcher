@@ -50,9 +50,13 @@ Place this dependency inside your build.gradle
 
 ```groovy
 
+repositories {
+	mavenCentral()
+}
+
 dependencies {
     
-    compile "com.foreks:vertx-config-launcher:1.0.0"
+    compile 'com.foreks:vertx-config-launcher:0.9.0'
     
 }
 
