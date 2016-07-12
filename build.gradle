@@ -8,7 +8,7 @@ plugins {
 
 sourceCompatibility = '1.8'
 
-version = "0.9.2"
+version = "0.9.3"
 group = "com.foreks"
 repositories {
 	mavenCentral()
@@ -38,8 +38,14 @@ uploadArchives {
 	repositories {
 		mavenDeployer {
 			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+			/*repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
 				authentication(userName: ossrhUserName, password: ossrhPassword)
+			}*/
+			repository(url: "http://dev.foreks.com/nexus/content/repositories/releases") {
+				authentication(userName: nexusUsername, password: nexusPassword)
+			}
+			snapshotRepository(url: "http://dev.foreks.com/nexus/content/repositories/snapshots") {
+				authentication(userName: nexusUsername, password: nexusPassword);
 			}
 			pom.project {
 				name 'vertx-config-launcher'

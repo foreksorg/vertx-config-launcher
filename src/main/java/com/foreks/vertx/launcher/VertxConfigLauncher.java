@@ -1,6 +1,7 @@
 package com.foreks.vertx.launcher;
 
 import com.hazelcast.config.FileSystemXmlConfig;
+import com.hazelcast.core.LifecycleEvent;
 import freemarker.template.TemplateException;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.VertxOptions;
@@ -11,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import rx.Observable;
 import rx.functions.Action1;
+import rx.schedulers.Schedulers;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,6 +20,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.RunnableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class VertxConfigLauncher {
 
@@ -53,10 +58,33 @@ public class VertxConfigLauncher {
 
 	private static Observable<Vertx> createVertx(VertxOptions vertxOptions) {
 		if (vertxOptions.isClustered()) {
-			vertxOptions.setClusterManager(getClusterManager());
-			return Vertx.clusteredVertxObservable(vertxOptions);
+			HazelcastClusterManager clusterManager = getClusterManager();
+			vertxOptions.setClusterManager(clusterManager);
+			return Vertx.clusteredVertxObservable(vertxOptions).map(vertx -> {
+				clusterManager.getHazelcastInstance().getLifecycleService().addLifecycleListener(state -> {
+					if (state.getState() == LifecycleEvent.LifecycleState.SHUTTING_DOWN) {
+						beforeLeaveUndeploy(vertx);
+					}
+				});
+				return vertx;
+			});
 		} else {
-			return Observable.just(Vertx.vertx(vertxOptions));
+			return Observable.just(Vertx.vertx(vertxOptions)).map(vertx -> {
+				Runtime.getRuntime().addShutdownHook(new Thread(() -> beforeLeaveUndeploy(vertx)));
+				return vertx;
+			});
+		}
+	}
+
+	private static void beforeLeaveUndeploy(Vertx vertx) {
+		CountDownLatch latch = new CountDownLatch(1);
+		Observable.from(vertx.deploymentIDs().stream().map(vertx::undeployObservable).toArray()).doOnCompleted(() -> {
+			latch.countDown();
+		}).subscribe();
+		try {
+			latch.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -75,11 +103,12 @@ public class VertxConfigLauncher {
 	private static Action1<Throwable> logError = throwable -> LOGGER.error("Verticle Could not be Deployed {}", throwable);
 
 	public static void main(String[] args) {
-		readConf(System.getProperty("conf")).ifPresent(c -> {
-			createVertx(new VertxOptions(c.getJsonObject("vertxOptions")))
-					.flatMap(vertx -> deployVerticles(vertx, c.getJsonObject("verticles")))
-																		  .subscribe(logSuccess, logError);
-		});
+		readConf(System.getProperty("conf")).ifPresent(c -> createVertx(new VertxOptions(c.getJsonObject("vertxOptions"))).flatMap(vertx -> deployVerticles(vertx,
+																																							c.getJsonObject(
+																																									"verticles")))
+																														  .subscribe(
+																																  logSuccess,
+																																  logError));
 	}
 
 }
