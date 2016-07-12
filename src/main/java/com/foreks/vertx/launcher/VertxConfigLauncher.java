@@ -1,6 +1,7 @@
 package com.foreks.vertx.launcher;
 
 import com.hazelcast.config.FileSystemXmlConfig;
+import com.hazelcast.core.ICountDownLatch;
 import com.hazelcast.core.LifecycleEvent;
 import freemarker.template.TemplateException;
 import io.vertx.core.DeploymentOptions;
@@ -63,26 +64,38 @@ public class VertxConfigLauncher {
 			return Vertx.clusteredVertxObservable(vertxOptions).map(vertx -> {
 				clusterManager.getHazelcastInstance().getLifecycleService().addLifecycleListener(state -> {
 					if (state.getState() == LifecycleEvent.LifecycleState.SHUTTING_DOWN) {
-						beforeLeaveUndeploy(vertx);
+						ICountDownLatch latch = clusterManager.getHazelcastInstance().getCountDownLatch("shutdown.latch");
+						latch.trySetCount(1);
+						beforeLeaveUndeploy(vertx, latch);
 					}
 				});
 				return vertx;
 			});
 		} else {
 			return Observable.just(Vertx.vertx(vertxOptions)).map(vertx -> {
-				Runtime.getRuntime().addShutdownHook(new Thread(() -> beforeLeaveUndeploy(vertx)));
+				Runtime.getRuntime().addShutdownHook(new Thread(() -> beforeLeaveUndeploy(vertx, new CountDownLatch(1))));
 				return vertx;
 			});
 		}
 	}
 
-	private static void beforeLeaveUndeploy(Vertx vertx) {
-		CountDownLatch latch = new CountDownLatch(1);
-		Observable.from(vertx.deploymentIDs().stream().map(vertx::undeployObservable).toArray()).doOnCompleted(() -> {
-			latch.countDown();
-		}).subscribe();
+	private static void beforeLeaveUndeploy(Vertx vertx, ICountDownLatch latch) {
+		Observable.from(vertx.deploymentIDs().stream().map(vertx::undeployObservable).toArray())
+				  .doOnCompleted(latch::countDown)
+				  .subscribe();
 		try {
-			latch.await(30000,TimeUnit.MILLISECONDS);
+			latch.await(30000, TimeUnit.MILLISECONDS);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void beforeLeaveUndeploy(Vertx vertx, CountDownLatch latch) {
+		Observable.from(vertx.deploymentIDs().stream().map(vertx::undeployObservable).toArray())
+				  .doOnCompleted(latch::countDown)
+				  .subscribe();
+		try {
+			latch.await(30000, TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
