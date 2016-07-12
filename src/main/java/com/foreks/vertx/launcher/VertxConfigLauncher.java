@@ -82,7 +82,7 @@ public class VertxConfigLauncher {
 			latch.countDown();
 		}).subscribe();
 		try {
-			latch.await();
+			latch.await(30000,TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
