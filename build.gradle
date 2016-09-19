@@ -3,7 +3,7 @@ plugins {
 	id 'eclipse'
 	id 'idea'
 	id "maven"
-	id 'signing'
+	//id 'signing'
 }
 
 sourceCompatibility = '1.8'
@@ -29,16 +29,16 @@ artifacts {
 	archives sourcesJar
 	archives javadocJar
 }
-
+/*
 signing {
 	sign configurations.archives
 }
-
+*/
 uploadArchives {
 	repositories {
 		mavenDeployer {
-			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
-/*
+/*			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
 			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
 				authentication(userName: ossrhUserName, password: ossrhPassword)
 			}*/
@@ -88,5 +88,17 @@ sourceSets {
 		resources { srcDir 'src/test/resources' }
 	}
 }
-
+dependencies{
+	compileOnly 'org.apache.curator:curator-x-discovery:2.11.0'
+	compileOnly 'org.apache.curator:curator-test:2.11.0'
+	compileOnly "io.vertx:vertx-core:3.3.2"
+	compileOnly 'io.vertx:vertx-rx-java:3.3.2'
+	compileOnly 'org.freemarker:freemarker:2.3.23'
+	compileOnly "io.vertx:vertx-hazelcast:3.3.2"
+	compileOnly 'com.hazelcast:hazelcast-zookeeper:3.6.1'
+	compileOnly 'com.hazelcast:hazelcast-client:3.6.3'
+	runtime 'org.slf4j:slf4j-log4j12:1.7.5'
+	compileOnly 'org.slf4j:jcl-over-slf4j:1.7.5'
+	compileOnly 'org.apache.logging.log4j:log4j:2.5'
+}
 task wrapper(type: Wrapper) { gradleVersion = '2.14' }
