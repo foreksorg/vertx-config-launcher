@@ -1,33 +1,33 @@
 plugins {
-	id 'java'
-	id 'eclipse'
-	id 'idea'
-	id "maven"
-	//id 'signing'
+    id 'java'
+    id 'eclipse'
+    id 'idea'
+    id "maven"
+    //id 'signing'
 }
 
 sourceCompatibility = '1.8'
 
-version = "0.9.5"
+version = "0.9.6"
 group = "com.foreks"
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-	classifier = 'sources'
-	from sourceSets.main.allSource
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-	classifier = 'javadoc'
-	from javadoc.destinationDir
+    classifier = 'javadoc'
+    from javadoc.destinationDir
 }
 
 artifacts {
-	archives jar
-	archives sourcesJar
-	archives javadocJar
+    archives jar
+    archives sourcesJar
+    archives javadocJar
 }
 /*
 signing {
@@ -35,70 +35,70 @@ signing {
 }
 */
 uploadArchives {
-	repositories {
-		mavenDeployer {
+    repositories {
+        mavenDeployer {
 /*			beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
 			repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
 				authentication(userName: ossrhUserName, password: ossrhPassword)
 			}*/
-			repository(url: "http://dev.foreks.com/nexus/content/repositories/releases") {
-				authentication(userName: nexusUsername, password: nexusPassword)
-			}
-			snapshotRepository(url: "http://dev.foreks.com/nexus/content/repositories/snapshots") {
-				authentication(userName: nexusUsername, password: nexusPassword);
-			}
-			pom.project {
-				name 'vertx-config-launcher'
-				description 'This project aims to launch Vert.x, the toolkit for creating reactive apps on the JVM, in a dynamic way.'
-				url 'https://github.com/foreksorg/vertx-config-launcher.git'
-				scm {
-					url 'https://github.com/foreksorg/vertx-config-launcher'
-					connection 'scm:git:http://github.com/foreksorg/vertx-config-launcher.git'
-					developerConnection 'scm:git:SercanKaraoglu@github.com:foreksorg/vertx-config-launcher.git'
-				}
-				licenses {
-					license {
-						name 'The Apache Software License, Version 2.0'
-						url 'http://www.apache.org/license/LICENSE-2.0.txt'
-						distribution 'repo'
-					}
-				}
-				developers {
-					developer {
-						id 'SercanKaraoglu'
-						name 'Sercan Karaoglu'
-						email 'sercan_karaoglu@yahoo.com'
-					}
-				}
-
-			}
-		}
-	}
+            repository(url: "http://dev.foreks.com/nexus/content/repositories/releases") {
+                authentication(userName: nexusUsername, password: nexusPassword)
+            }
+            snapshotRepository(url: "http://dev.foreks.com/nexus/content/repositories/snapshots") {
+                authentication(userName: nexusUsername, password: nexusPassword);
+            }
+            pom.project {
+                name 'vertx-config-launcher'
+                description 'This project aims to launch Vert.x, the toolkit for creating reactive apps on the JVM, in a dynamic way.'
+                url 'https://github.com/foreksorg/vertx-config-launcher.git'
+                scm {
+                    url 'https://github.com/foreksorg/vertx-config-launcher'
+                    connection 'scm:git:http://github.com/foreksorg/vertx-config-launcher.git'
+                    developerConnection 'scm:git:SercanKaraoglu@github.com:foreksorg/vertx-config-launcher.git'
+                }
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                        distribution 'repo'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'SercanKaraoglu'
+                        name 'Sercan Karaoglu'
+                        email 'sercan_karaoglu@yahoo.com'
+                    }
+                }
+                
+            }
+        }
+    }
 }
 
 
 sourceSets {
-	main {
-		java { srcDir 'src/main/java' }
-		resources { srcDir 'src/main/resources' }
-	}
-	test {
-		java { srcDir 'src/test/java' }
-		resources { srcDir 'src/test/resources' }
-	}
+    main {
+        java { srcDir 'src/main/java' }
+        resources { srcDir 'src/main/resources' }
+    }
+    test {
+        java { srcDir 'src/test/java' }
+        resources { srcDir 'src/test/resources' }
+    }
 }
-dependencies{
-	compileOnly 'org.apache.curator:curator-x-discovery:2.11.0'
-	compileOnly 'org.apache.curator:curator-test:2.11.0'
-	compileOnly "io.vertx:vertx-core:3.3.2"
-	compileOnly 'io.vertx:vertx-rx-java:3.3.2'
-	compileOnly 'org.freemarker:freemarker:2.3.23'
-	compileOnly "io.vertx:vertx-hazelcast:3.3.2"
-	compileOnly 'com.hazelcast:hazelcast-zookeeper:3.6.1'
-	compileOnly 'com.hazelcast:hazelcast-client:3.6.3'
-	runtime 'org.slf4j:slf4j-log4j12:1.7.5'
-	compileOnly 'org.slf4j:jcl-over-slf4j:1.7.5'
-	compileOnly 'org.apache.logging.log4j:log4j:2.5'
+dependencies {
+    compile 'org.freemarker:freemarker:2.3.23'
+    compileOnly 'org.apache.curator:curator-x-discovery:2.11.0'
+    compileOnly 'org.apache.curator:curator-test:2.11.0'
+    compileOnly "io.vertx:vertx-core:3.3.2"
+    compileOnly 'io.vertx:vertx-rx-java:3.3.2'
+    compileOnly "io.vertx:vertx-hazelcast:3.3.2"
+    compileOnly 'com.hazelcast:hazelcast-zookeeper:3.6.1'
+    compileOnly 'com.hazelcast:hazelcast-client:3.6.3'
+    runtime 'org.slf4j:slf4j-log4j12:1.7.5'
+    compileOnly 'org.slf4j:jcl-over-slf4j:1.7.5'
+    compileOnly 'org.apache.logging.log4j:log4j:2.5'
 }
 task wrapper(type: Wrapper) { gradleVersion = '2.14' }
