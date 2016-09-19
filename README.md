@@ -8,6 +8,23 @@ inconsistencies at production environment, that is why we do not read default-cl
 If application is going to be launched as clustered then cluster.xml file must be provided explicitly 
 by defining -Dcluster-xml jvm argument.
 
+### Dependencies
+
+Add necessary such as dependencies
+ 
+```groovy
+	compile 'org.apache.curator:curator-x-discovery:2.11.0'
+	compile 'org.apache.curator:curator-test:2.11.0'
+	compile "io.vertx:vertx-core:3.3.2"
+	compile 'io.vertx:vertx-rx-java:3.3.2'
+	compile 'org.freemarker:freemarker:2.3.23'
+	compile "io.vertx:vertx-hazelcast:3.3.2"
+	compile 'com.hazelcast:hazelcast-zookeeper:3.6.1'
+	compile 'com.hazelcast:hazelcast-client:3.6.3'
+	runtime 'org.slf4j:slf4j-log4j12:1.7.5'
+	compile 'org.slf4j:jcl-over-slf4j:1.7.5'
+	compile 'org.apache.logging.log4j:log4j:2.5'
+```
 
 ### build.gradle Config
 
