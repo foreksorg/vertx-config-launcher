@@ -8,12 +8,14 @@ package com.foreks.vertx.launcher;
 import com.hazelcast.config.FileSystemXmlConfig;
 import com.hazelcast.core.ICountDownLatch;
 import com.hazelcast.core.LifecycleEvent;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
+import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
-import io.vertx.rxjava.core.Vertx;
 import io.vertx.spi.cluster.hazelcast.HazelcastClusterManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import rx.Observable;
 
 import java.io.FileNotFoundException;
 import java.util.concurrent.TimeUnit;
@@ -21,20 +23,30 @@ import java.util.concurrent.TimeUnit;
 public class ClusteredVertxFactory implements VertxFactory {
     private final static Logger LOGGER = LoggerFactory.getLogger(ClusteredVertxFactory.class);
     private ICountDownLatch latch;
+
     @Override
-    public Observable<Vertx> createVertx(VertxOptions vertxOptions) {
+    public Single<Vertx> createVertx(VertxOptions vertxOptions) {
         HazelcastClusterManager clusterManager = getClusterManager();
-        ICountDownLatch latch = clusterManager.getHazelcastInstance().getCountDownLatch("shutdown.latch");
+        this.latch = clusterManager.getHazelcastInstance().getCountDownLatch("shutdown.latch");
         latch.trySetCount(1);
 
         vertxOptions.setClusterManager(clusterManager);
-        return Vertx.clusteredVertxObservable(vertxOptions).map(vertx -> {
-            clusterManager.getHazelcastInstance().getLifecycleService().addLifecycleListener(state -> {
-                if (state.getState() == LifecycleEvent.LifecycleState.SHUTTING_DOWN) {
-                    beforeLeaveUndeploy(vertx);
+        return Single.fromPublisher(publisher -> {
+            Vertx.clusteredVertx(vertxOptions, response -> {
+                if (response.succeeded()) {
+                    Vertx vertx = response.result();
+                    clusterManager.getHazelcastInstance().getLifecycleService().addLifecycleListener(state -> {
+                        if (state.getState() == LifecycleEvent.LifecycleState.SHUTTING_DOWN) {
+                            beforeLeaveUndeploy(vertx);
+                        }
+                    });
+                    publisher.onNext(vertx);
+                } else {
+                    publisher.onError(response.cause());
                 }
+
+                publisher.onComplete();
             });
-            return vertx;
         });
     }
 
@@ -49,8 +61,12 @@ public class ClusteredVertxFactory implements VertxFactory {
     }
 
     public void beforeLeaveUndeploy(Vertx vertx) {
-        Observable.from(vertx.deploymentIDs().stream().map(vertx::undeployObservable).toArray())
-                  .doOnCompleted(latch::countDown)
+        Observable.fromIterable(vertx.deploymentIDs())
+                  .flatMapCompletable(id -> Completable.fromSingle(s -> {
+                                          vertx.undeploy(id, s::onSuccess);
+                                      })
+                                     )
+                  .doOnComplete(latch::countDown)
                   .subscribe();
         try {
             latch.await(30000, TimeUnit.MILLISECONDS);

@@ -5,12 +5,12 @@
  */
 package com.foreks.vertx.launcher;
 
+import io.reactivex.Single;
+import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
-import io.vertx.rxjava.core.Vertx;
-import rx.Observable;
 
 public interface VertxFactory {
-    static Observable<Vertx> create(VertxOptions vertxOptions) {
+    static Single<Vertx> create(VertxOptions vertxOptions) {
         if (vertxOptions.isClustered()) {
             return new ClusteredVertxFactory().createVertx(vertxOptions);
         } else {
@@ -18,7 +18,7 @@ public interface VertxFactory {
         }
     }
 
-    Observable<Vertx> createVertx(VertxOptions vertxOptions);
+    Single<Vertx> createVertx(VertxOptions vertxOptions);
 
     void beforeLeaveUndeploy(Vertx vertx);
 }

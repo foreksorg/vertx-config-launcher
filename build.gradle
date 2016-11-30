@@ -8,7 +8,7 @@ plugins {
 
 sourceCompatibility = '1.8'
 
-version = "0.9.8"
+version = "1.0.0-SNAPSHOT"
 group = "com.foreks"
 repositories {
     mavenCentral()
@@ -92,9 +92,9 @@ dependencies {
     compile 'org.freemarker:freemarker:2.3.23'
     compileOnly 'org.apache.curator:curator-x-discovery:2.11.0'
     compileOnly 'org.apache.curator:curator-test:2.11.0'
-    compileOnly "io.vertx:vertx-core:3.3.2"
-    compileOnly 'io.vertx:vertx-rx-java:3.3.2'
-    compileOnly "io.vertx:vertx-hazelcast:3.3.2"
+    compileOnly "io.vertx:vertx-core:3.3.3"
+    compileOnly 'io.reactivex.rxjava2:rxjava:2.0.1'
+    compileOnly "io.vertx:vertx-hazelcast:3.3.3"
     compileOnly 'com.hazelcast:hazelcast-zookeeper:3.6.1'
     compileOnly 'com.hazelcast:hazelcast-client:3.6.3'
     runtime 'org.slf4j:slf4j-log4j12:1.7.5'
