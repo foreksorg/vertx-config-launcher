@@ -63,7 +63,7 @@ public class VertxConfigLauncher {
     private static Consumer<Throwable> logError = throwable -> LOGGER.error("Verticle Could not be Deployed {}", throwable);
 
     public static void main(String[] args) {
-        readConf(System.getProperty("conf"))
+        readConf(System.getProperty("config.file"))
                 .ifPresent(c -> VertxFactory.create(new VertxOptions(c.getJsonObject("vertxOptions")))
                                             .flatMapObservable(vertx -> deployVerticles(vertx, c.getJsonObject("verticles")))
                                             .subscribe(logSuccess, logError));
